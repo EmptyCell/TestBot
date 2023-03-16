@@ -43,19 +43,47 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
   }
 })
 
-client.on('interactionCreate', (interaction) => {
+client.on('interactionCreate', async (interaction) => {
 	if (interaction.isButton()) {
-    const channel = client.channels.cache.get(process.env.CHANNEL);
+    if (interaction.customId === 'welcomeBtn') {
+      const channel = client.channels.cache.get(process.env.CHANNEL);
 
-    let userID = interaction.message.mentions.users.first().id;
-    let reply = {
-      content: `<@${interaction.user.id}> says hi to <@` + userID + '>',
-      stickers: client.guilds.cache.get(process.env.GUILD)
-        .stickers.cache.filter(s => s.id === process.env.STICKER)
-    };
+      let userID = interaction.message.mentions.users.first().id;
+      let reply = {
+        content: `<@${interaction.user.id}> says hi to <@` + userID + '>',
+        stickers: client.guilds.cache.get(process.env.GUILD)
+          .stickers.cache.filter(s => s.id === process.env.STICKER)
+      };
 
-  	channel.send(reply);
-    interaction.deferUpdate();
+    	channel.send(reply);
+      interaction.deferUpdate();
+    } else {
+      try {
+        const role = interaction.guild.roles.cache.get(interaction.customId);
+        await interaction.deferReply({ ephemeral: true });
+
+        if (!role) {
+          interaction.reply({
+            content: "I couldn't find that role",
+          });
+
+          return;
+        }
+
+        const hasRole = interaction.member.roles.cache.has(role.id);
+
+        if (hasRole) {
+          await interaction.member.roles.remove(role);
+          await interaction.editReply(`The role ${role} has been removed.`);
+          return;
+        }
+
+        await interaction.member.roles.add(role);
+        await interaction.editReply(`The role ${role} has been added.`);
+      } catch (err) {
+        console.log(err);
+      }
+    }
   } else if (interaction.isChatInputCommand()) {
     if (interaction.commandName === 'add') {
       const num1 = interaction.options.get('first-number').value;
