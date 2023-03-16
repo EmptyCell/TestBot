@@ -5,6 +5,7 @@ const { Client,
         ButtonBuilder,
         ButtonStyle,
         EmbedBuilder,
+        ActivityType,
         Events } = require('discord.js');
 
 const client = new Client({
@@ -16,6 +17,25 @@ const client = new Client({
     IntentsBitField.Flags.MessageContent,
   ],
 });
+
+let status = [
+  {
+    name: 'Test Status 0',
+    type: ActivityType.Streaming,
+    url: 'https://www.twitch.tv/volasaurus'
+  },
+  {
+    name: 'Test Status 1',
+  },
+  {
+    name: 'Test Status 2',
+    type: ActivityType.Watching,
+  },
+  {
+    name: 'Test Status 3',
+    type: ActivityType.Listening,
+  },
+]
 
 client.on('guildMemberAdd', (member) => {
   const row = new ActionRowBuilder()
@@ -116,6 +136,11 @@ client.on('interactionCreate', async (interaction) => {
 
 client.on('ready', (c) => {
   console.log(`${c.user.tag} is running.`);
-})
+
+  setInterval(() => {
+    let random = Math.floor(Math.random() * status.length);
+    client.user.setActivity(status[random]);
+  }, 10000)
+});
 
 client.login(process.env.TOKEN);
