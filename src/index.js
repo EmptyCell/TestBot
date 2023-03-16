@@ -4,6 +4,7 @@ const { Client,
         ActionRowBuilder,
         ButtonBuilder,
         ButtonStyle,
+        EmbedBuilder,
         Events } = require('discord.js');
 
 const client = new Client({
@@ -61,6 +62,26 @@ client.on('interactionCreate', (interaction) => {
       const num2 = interaction.options.get('second-number').value;
 
       interaction.reply(`The sum is ${num1 + num2}`);
+    } else if (interaction.commandName === 'embed') {
+      const embed = new EmbedBuilder()
+        .setTitle('Embed title')
+        .setDescription('This is an embed description')
+        .setColor(0x00ff4c)
+        .addFields({
+                    name: 'First field title',
+                    value: 'First field value',
+                    inline: true
+                  }, {
+                    name: 'Second field title',
+                    value: 'Second field value',
+                    inline: true
+                  }, {
+                    name: 'Third field title',
+                    value: 'Third field value',
+                    inline: true
+                  });
+
+      interaction.reply({ embeds: [embed] });
     }
   }
 });
