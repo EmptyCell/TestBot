@@ -6,7 +6,7 @@ const { Client,
         ButtonStyle,
         Events } = require('discord.js');
 
-const bot = new Client({
+const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers,
@@ -16,7 +16,7 @@ const bot = new Client({
   ],
 });
 
-bot.on('guildMemberAdd', (member) => {
+client.on('guildMemberAdd', (member) => {
   const row = new ActionRowBuilder()
     .addComponents(
       new ButtonBuilder()
@@ -31,36 +31,42 @@ bot.on('guildMemberAdd', (member) => {
     components: [row]
   }
 
-  const channel = bot.channels.cache.get(process.env.CHANNEL);
+  const channel = client.channels.cache.get(process.env.CHANNEL);
   channel.send(welcome);
 })
 
-// TODO: Doesn't react, unknown reason
-bot.on('guildMemberUpdate', (oldMember, newMember) => {
-  if (oldMember.premiumSince !== newMember.premiumSince) {
-    const channel = bot.channels.cache.get(process.env.CHANNEL);
+client.on('guildMemberUpdate', (oldMember, newMember) => {
+  if (!oldMember.premiumSince && newMember.premiumSince) {
+    const channel = client.channels.cache.get(process.env.CHANNEL);
     channel.send(`**${newMember.user.tag}** has boosted the server!`);
   }
 })
 
-bot.on(Events.InteractionCreate, (interaction) => {
-	if (!interaction.isButton()) return;
+client.on('interactionCreate', (interaction) => {
+	if (interaction.isButton()) {
+    const channel = client.channels.cache.get(process.env.CHANNEL);
 
-  const channel = bot.channels.cache.get(process.env.CHANNEL);
+    let userID = interaction.message.mentions.users.first().id;
+    let reply = {
+      content: `<@${interaction.user.id}> says hi to <@` + userID + '>',
+      stickers: client.guilds.cache.get(process.env.GUILD)
+        .stickers.cache.filter(s => s.id === process.env.STICKER)
+    };
 
-  let userID = interaction.message.mentions.users.first().id;
-  let reply = {
-    content: `<@${interaction.user.id}> says hi to <@` + userID + '>',
-    stickers: bot.guilds.cache.get(process.env.GUILD)
-      .stickers.cache.filter(s => s.id === process.env.STICKER)
-  };
+  	channel.send(reply);
+    interaction.deferUpdate();
+  } else if (interaction.isChatInputCommand()) {
+    if (interaction.commandName === 'add') {
+      const num1 = interaction.options.get('first-number').value;
+      const num2 = interaction.options.get('second-number').value;
 
-	channel.send(reply);
-  if (interaction.isButton()) return interaction.deferUpdate();
+      interaction.reply(`The sum is ${num1 + num2}`);
+    }
+  }
 });
 
-bot.on('ready', (c) => {
+client.on('ready', (c) => {
   console.log(`${c.user.tag} is running.`);
 })
 
-bot.login(process.env.TOKEN);
+client.login(process.env.TOKEN);
