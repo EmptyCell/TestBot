@@ -7,7 +7,7 @@ module.exports = (client) => {
   for (const eventFolder of eventFolders) {
     const eventFiles = getAllFiles(eventFolder);
     eventFiles.sort((a, b) => a > b);
-    
+
     const eventName = eventFolder.replace(/\\/g, '/').split('/').pop();
 
     client.on(eventName, async (arg) => {
@@ -17,13 +17,4 @@ module.exports = (client) => {
       }
     });
   }
-
-  /*client.on('ready', (c) => {
-    console.log(`${c.user.tag} is running.`);
-
-    setInterval(() => {
-      let random = Math.floor(Math.random() * status.length);
-      client.user.setActivity(status[random]);
-    }, 10000)
-  });*/
 }
