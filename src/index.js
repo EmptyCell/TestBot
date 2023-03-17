@@ -7,6 +7,7 @@ const { Client,
         EmbedBuilder,
         ActivityType,
         Events } = require('discord.js');
+const eventHandler = require('./handlers/eventHandler')
 
 const client = new Client({
   intents: [
@@ -36,6 +37,8 @@ let status = [
     type: ActivityType.Listening,
   },
 ]
+
+eventHandler(client);
 
 client.on('guildMemberAdd', (member) => {
   const row = new ActionRowBuilder()
@@ -132,15 +135,6 @@ client.on('interactionCreate', async (interaction) => {
       interaction.reply({ embeds: [embed] });
     }
   }
-});
-
-client.on('ready', (c) => {
-  console.log(`${c.user.tag} is running.`);
-
-  setInterval(() => {
-    let random = Math.floor(Math.random() * status.length);
-    client.user.setActivity(status[random]);
-  }, 10000)
 });
 
 client.login(process.env.TOKEN);

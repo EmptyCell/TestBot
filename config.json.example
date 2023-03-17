@@ -1,0 +1,4 @@
+{
+  "testServer": "PUT_GUILD_ID_HERE",
+  "devs": ["PUT_MEMBER_ID_HERE", "PUT_MEMBER_ID_HERE"]
+}
