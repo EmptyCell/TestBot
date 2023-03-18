@@ -10,7 +10,7 @@ module.exports = {
 
       let userID = interaction.message.mentions.users.first().id;
       let reply = {
-        content: `<@${interaction.user.id}> says hi to <@` + userID + '>',
+        content: `<@${interaction.user.id}> says hi to <@${userID}>`,
         stickers: client.guilds.cache.get(testServer)
           .stickers.cache.filter(s => s.id === sticker)
       };
